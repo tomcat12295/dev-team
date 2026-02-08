@@ -1,6 +1,6 @@
 {
   "name": "dev-team-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Multi-agent development team system for Claude Code — orchestrate PM, Leader, and Member roles via MCP with WezTerm integration",
   "main": "dist/index.js",
   "type": "module",

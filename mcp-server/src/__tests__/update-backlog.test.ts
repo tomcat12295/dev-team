@@ -2,6 +2,7 @@ import { jest, describe, test, expect, beforeAll, beforeEach, afterEach } from '
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { updateBacklog } from '../tools/update-backlog.js';
+import { cancelPendingDashboardWrite } from '../utils/queue.js';
 
 // Set up test environment
 const TEST_PROJECT_PATH = path.join(process.cwd(), 'test-temp-update-backlog');
@@ -36,6 +37,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+    // Cancel pending dashboard write before removing test directory
+    cancelPendingDashboardWrite();
     // Clean up test directory
     try {
         await fs.rm(TEST_PROJECT_PATH, { recursive: true, force: true });

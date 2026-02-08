@@ -175,6 +175,17 @@ async function writeDashboard(dashboard: Dashboard): Promise<void> {
     }, 500);
 }
 
+/**
+ * Cancel pending dashboard write timer (for clean test teardown)
+ */
+export function cancelPendingDashboardWrite(): void {
+    if (dashWriteTimer) {
+        clearTimeout(dashWriteTimer);
+        dashWriteTimer = null;
+    }
+    pendingDashboard = null;
+}
+
 export async function ensureDevTeamStructure(): Promise<void> {
     const devTeamPath = getDevTeamPath();
     const dirs = [
