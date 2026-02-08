@@ -55,10 +55,8 @@ export async function archiveCompletedTasks(olderThanDays: number = 7): Promise<
         // Find tasks to archive (completed and older than cutoff)
         const tasksToArchive = dashboard.taskList.filter(t => {
             if (t.status !== 'completed') return false;
-            const completedAt = t.completedAt ? new Date(t.completedAt).getTime() : 0;
-            // completedAtがない場合はcreatedAtで判定
-            const taskTime = completedAt || new Date(t.createdAt).getTime();
-            return taskTime < cutoffTime;
+            if (!t.completedAt) return false;
+            return new Date(t.completedAt).getTime() < cutoffTime;
         });
 
         if (tasksToArchive.length === 0) {

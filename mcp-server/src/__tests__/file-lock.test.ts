@@ -63,7 +63,9 @@ describe('file-lock', () => {
         });
 
         it('should create directory and file if file does not exist', async () => {
-            mockAccess.mockRejectedValueOnce(new Error('ENOENT'));
+            const enoentError = new Error('ENOENT') as NodeJS.ErrnoException;
+            enoentError.code = 'ENOENT';
+            mockAccess.mockRejectedValueOnce(enoentError);
             mockMkdir.mockResolvedValueOnce(undefined);
             mockWriteFile.mockResolvedValueOnce(undefined);
 
@@ -105,7 +107,9 @@ describe('file-lock', () => {
 
         it('should ensure file exists before acquiring lock', async () => {
             const mockRelease = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-            mockAccess.mockRejectedValueOnce(new Error('ENOENT'));
+            const enoentError = new Error('ENOENT') as NodeJS.ErrnoException;
+            enoentError.code = 'ENOENT';
+            mockAccess.mockRejectedValueOnce(enoentError);
             mockMkdir.mockResolvedValueOnce(undefined);
             mockWriteFile.mockResolvedValueOnce(undefined);
             mockLock.mockResolvedValueOnce(mockRelease);
@@ -161,7 +165,9 @@ describe('file-lock', () => {
         });
 
         it('should ensure file exists before checking lock', async () => {
-            mockAccess.mockRejectedValueOnce(new Error('ENOENT'));
+            const enoentError = new Error('ENOENT') as NodeJS.ErrnoException;
+            enoentError.code = 'ENOENT';
+            mockAccess.mockRejectedValueOnce(enoentError);
             mockMkdir.mockResolvedValueOnce(undefined);
             mockWriteFile.mockResolvedValueOnce(undefined);
             mockCheck.mockResolvedValueOnce(false);

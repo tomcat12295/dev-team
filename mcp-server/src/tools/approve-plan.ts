@@ -1,4 +1,4 @@
-import { Role } from '../types/task.js';
+import { Role, TaskSummary } from '../types/task.js';
 import { Message } from '../types/message.js';
 import { addMessage, generateMessageId, addActivity, updateTaskInList, updateMemberStatus } from '../utils/queue.js';
 import { notifyRole } from '../utils/wezterm.js';
@@ -62,7 +62,7 @@ export async function approvePlan(params: ApprovePlanParams): Promise<ApprovePla
         };
 
         // In strict mode, don't set status to in_progress yet (wait for test approval)
-        const taskUpdate: any = {
+        const taskUpdate: Partial<TaskSummary> = {
             phase: nextPhase,
             plan: updatedPlan,
         };

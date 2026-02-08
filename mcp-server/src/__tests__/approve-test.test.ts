@@ -5,7 +5,7 @@ import { createMockDashboard, createMockTaskSummary } from './helpers/mock-facto
 // ESMモジュールのモック
 const mockGetCurrentRole = jest.fn<() => Role>();
 const mockGetDashboard = jest.fn<() => Promise<Dashboard>>();
-const mockGenerateId = jest.fn<() => Promise<string>>();
+const mockGenerateMessageId = jest.fn<() => string>();
 const mockAddMessage = jest.fn<(to: Role, message: any) => Promise<void>>();
 const mockAddActivity = jest.fn<(activity: any) => Promise<void>>();
 const mockUpdateTaskInList = jest.fn<(taskId: string, updates: any) => Promise<boolean>>();
@@ -22,7 +22,7 @@ jest.unstable_mockModule('../utils/permission.js', () => ({
 
 jest.unstable_mockModule('../utils/queue.js', () => ({
     getDashboard: mockGetDashboard,
-    generateId: mockGenerateId,
+    generateMessageId: mockGenerateMessageId,
     addMessage: mockAddMessage,
     addActivity: mockAddActivity,
     updateTaskInList: mockUpdateTaskInList,
@@ -59,7 +59,7 @@ describe('approveTest', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockGetCurrentRole.mockReturnValue('leader');
-        mockGenerateId.mockResolvedValue('M-001');
+        mockGenerateMessageId.mockReturnValue('M-001');
         mockAddMessage.mockResolvedValue(undefined);
         mockAddActivity.mockResolvedValue(undefined);
         mockUpdateTaskInList.mockResolvedValue(true);

@@ -438,7 +438,7 @@ export async function addApprovalRequest(request: Omit<ApprovalRequest, 'id' | '
     const dashboardPath = getDashboardPath();
     const newRequest: ApprovalRequest = {
         ...request,
-        id: `approval-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `approval-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         requestedAt: new Date().toISOString(),
         status: 'pending',
     };

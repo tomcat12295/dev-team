@@ -192,7 +192,13 @@ export async function completeTask(taskId: string): Promise<void> {
  * 親タスクの全子タスクが完了しているか確認し、完了していれば親も完了にする
  * 再帰的に祖先タスクも確認する
  */
-async function checkAndCompleteParent(parentTaskId: string): Promise<void> {
+async function checkAndCompleteParent(parentTaskId: string, visitedIds: Set<string> = new Set()): Promise<void> {
+    if (visitedIds.has(parentTaskId)) {
+        error(`Circular parent-child relationship detected: ${parentTaskId}`);
+        return;
+    }
+    visitedIds.add(parentTaskId);
+
     const dashboard = await getDashboard();
     const parentTask = dashboard.taskList.find(t => t.id === parentTaskId);
 
@@ -230,7 +236,7 @@ async function checkAndCompleteParent(parentTaskId: string): Promise<void> {
 
         // 祖先タスクも再帰的にチェック
         if (parentTask.parentTaskId) {
-            await checkAndCompleteParent(parentTask.parentTaskId);
+            await checkAndCompleteParent(parentTask.parentTaskId, visitedIds);
         }
     }
 }

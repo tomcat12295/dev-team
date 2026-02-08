@@ -988,7 +988,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     forbidden_files: Array.isArray(args?.forbidden_files) ? args.forbidden_files as string[] : undefined,
                     priority: typeof args?.priority === 'string' ? args.priority as 'high' | 'medium' | 'low' : undefined,
                     parent_task_id: typeof args?.parent_task_id === 'string' ? args.parent_task_id : undefined,
-                    task_type: typeof args?.task_type === 'string' ? args.task_type as 'investigation' | 'implementation' | 'review' | 'documentation' : undefined,
+                    task_type: typeof args?.task_type === 'string' ? args.task_type as 'investigation' | 'implementation' | 'review' | 'documentation' | 'plan' | 'test_plan' | 'test_implementation' : undefined,
                     clear_before: typeof args?.clear_before === 'boolean' ? args.clear_before : undefined,
                 });
                 return {
