@@ -82,18 +82,26 @@ export async function ensureMemoryStructure(): Promise<void> {
     const memoriesPath = getMemoriesPath();
     try {
         await fs.access(memoriesPath);
-    } catch {
-        await fs.writeFile(memoriesPath, '', 'utf-8');
-        info('Created memories.jsonl');
+    } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+            await fs.writeFile(memoriesPath, '', 'utf-8');
+            info('Created memories.jsonl');
+        } else {
+            throw err;
+        }
     }
 
     // project.md の初期化（存在しない場合のみ）
     const projectPath = getProjectContextPath();
     try {
         await fs.access(projectPath);
-    } catch {
-        await fs.writeFile(projectPath, PROJECT_CONTEXT_TEMPLATE, 'utf-8');
-        info('Created project.md with template');
+    } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+            await fs.writeFile(projectPath, PROJECT_CONTEXT_TEMPLATE, 'utf-8');
+            info('Created project.md with template');
+        } else {
+            throw err;
+        }
     }
 }
 

@@ -2,6 +2,7 @@ import { ApprovalRequest } from '../types/task.js';
 import { addApprovalRequest, addActivity } from '../utils/queue.js';
 import { getCurrentRole, validateApprovalPermission } from '../utils/permission.js';
 import { info, error } from '../utils/logger.js';
+import { validateRequiredString, validateEnumValue } from '../utils/validation.js';
 
 export interface RequestApprovalParams {
     title: string;
@@ -26,6 +27,17 @@ export async function requestApproval(params: RequestApprovalParams): Promise<Re
             error: permission.reason,
         };
     }
+
+    // Validate inputs
+    const titleCheck = validateRequiredString(params.title, 'title');
+    if (!titleCheck.valid) return { success: false, error: titleCheck.error };
+
+    const descCheck = validateRequiredString(params.description, 'description');
+    if (!descCheck.valid) return { success: false, error: descCheck.error };
+
+    const validTypes = ['design', 'implementation', 'skill', 'other'] as const;
+    const typeCheck = validateEnumValue(params.type, validTypes, 'type');
+    if (!typeCheck.valid) return { success: false, error: typeCheck.error };
 
     try {
         const approval = await addApprovalRequest({

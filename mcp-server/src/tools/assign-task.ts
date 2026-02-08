@@ -95,6 +95,11 @@ export async function assignTaskCore(params: AssignTaskParams, from: Role = 'lea
         params.allowed_files = [];
     }
 
+    // forbidden_filesが配列でない場合のデフォルト値設定
+    if (params.forbidden_files !== undefined && !Array.isArray(params.forbidden_files)) {
+        params.forbidden_files = [];
+    }
+
     try {
         // parent_task_idが未指定の場合、leaderのcurrentTaskを自動設定
         let effectiveParentId = params.parent_task_id;

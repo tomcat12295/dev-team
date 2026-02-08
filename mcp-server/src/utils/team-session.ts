@@ -210,62 +210,77 @@ export function generateRoleNames(memberCount: number = 2): string[] {
  */
 export async function createPanes(roles: string[]): Promise<PaneInfo> {
     const memberCount = roles.filter(r => r.startsWith('member-')).length;
+    const createdPaneIds: string[] = [];
 
-    // Create new window with PM pane
-    const { stdout: pmPane } = await execAsync('wezterm cli spawn --new-window');
-    const pmPaneId = pmPane.trim();
+    try {
+        // Create new window with PM pane
+        const { stdout: pmPane } = await execAsync('wezterm cli spawn --new-window');
+        const pmPaneId = pmPane.trim();
+        createdPaneIds.push(pmPaneId);
 
-    // Wait a bit for the window to be ready
-    await sleep(300);
+        // Wait a bit for the window to be ready
+        await sleep(300);
 
-    // Split right for leader (50% width)
-    const { stdout: leaderPane } = await execAsync(
-        `wezterm cli split-pane --right --pane-id ${pmPaneId} --percent 50`
-    );
-    const leaderPaneId = leaderPane.trim();
+        // Split right for leader (50% width)
+        const { stdout: leaderPane } = await execAsync(
+            `wezterm cli split-pane --right --pane-id ${pmPaneId} --percent 50`
+        );
+        const leaderPaneId = leaderPane.trim();
+        createdPaneIds.push(leaderPaneId);
 
-    const paneInfo: PaneInfo = {
-        pm: pmPaneId,
-        leader: leaderPaneId,
-        dashboard: '',
-        projectPath: '',
-        startTime: new Date().toISOString(),
-    };
+        const paneInfo: PaneInfo = {
+            pm: pmPaneId,
+            leader: leaderPaneId,
+            dashboard: '',
+            projectPath: '',
+            startTime: new Date().toISOString(),
+        };
 
-    // Create member panes
-    const leftColumnPanes = [pmPaneId];
-    const rightColumnPanes = [leaderPaneId];
-    const rowCount = 1 + Math.ceil(memberCount / 2);
+        // Create member panes
+        const leftColumnPanes = [pmPaneId];
+        const rightColumnPanes = [leaderPaneId];
+        const rowCount = 1 + Math.ceil(memberCount / 2);
 
-    for (let i = 0; i < memberCount; i++) {
-        const memberIndex = i + 1;
-        const memberRole = `member-${memberIndex.toString().padStart(2, '0')}`;
+        for (let i = 0; i < memberCount; i++) {
+            const memberIndex = i + 1;
+            const memberRole = `member-${memberIndex.toString().padStart(2, '0')}`;
 
-        let parentPane: string;
-        let splitPercent: number;
+            let parentPane: string;
+            let splitPercent: number;
 
-        if (memberIndex % 2 === 1) {
-            // Odd member: split bottom of left column
-            parentPane = leftColumnPanes[leftColumnPanes.length - 1];
-            splitPercent = Math.floor(100 / (rowCount - leftColumnPanes.length + 1));
-            const { stdout } = await execAsync(
-                `wezterm cli split-pane --bottom --pane-id ${parentPane} --percent ${splitPercent}`
-            );
-            leftColumnPanes.push(stdout.trim());
-            paneInfo[memberRole] = stdout.trim();
-        } else {
-            // Even member: split bottom of right column
-            parentPane = rightColumnPanes[rightColumnPanes.length - 1];
-            splitPercent = Math.floor(100 / (rowCount - rightColumnPanes.length + 1));
-            const { stdout } = await execAsync(
-                `wezterm cli split-pane --bottom --pane-id ${parentPane} --percent ${splitPercent}`
-            );
-            rightColumnPanes.push(stdout.trim());
-            paneInfo[memberRole] = stdout.trim();
+            if (memberIndex % 2 === 1) {
+                // Odd member: split bottom of left column
+                parentPane = leftColumnPanes[leftColumnPanes.length - 1];
+                splitPercent = Math.floor(100 / (rowCount - leftColumnPanes.length + 1));
+                const { stdout } = await execAsync(
+                    `wezterm cli split-pane --bottom --pane-id ${parentPane} --percent ${splitPercent}`
+                );
+                const newPaneId = stdout.trim();
+                createdPaneIds.push(newPaneId);
+                leftColumnPanes.push(newPaneId);
+                paneInfo[memberRole] = newPaneId;
+            } else {
+                // Even member: split bottom of right column
+                parentPane = rightColumnPanes[rightColumnPanes.length - 1];
+                splitPercent = Math.floor(100 / (rowCount - rightColumnPanes.length + 1));
+                const { stdout } = await execAsync(
+                    `wezterm cli split-pane --bottom --pane-id ${parentPane} --percent ${splitPercent}`
+                );
+                const newPaneId = stdout.trim();
+                createdPaneIds.push(newPaneId);
+                rightColumnPanes.push(newPaneId);
+                paneInfo[memberRole] = newPaneId;
+            }
         }
-    }
 
-    return paneInfo;
+        return paneInfo;
+    } catch (err) {
+        // Rollback: kill all created panes
+        for (const paneId of createdPaneIds) {
+            try { await execAsync(`wezterm cli kill-pane --pane-id ${paneId}`); } catch {}
+        }
+        throw err;
+    }
 }
 
 /**
@@ -724,10 +739,10 @@ export async function removeMember(projectPath: string, options: RemoveMemberOpt
                 await execAsync(`wezterm cli kill-pane --pane-id ${paneId}`);
             }
         } catch (err) {
-            logError(`  Warning: Failed to stop ${role}`, err);
+            logError(`  Warning: Failed to stop ${role} (pane may already be closed)`, err);
         }
 
-        // Remove from pane info
+        // Remove from pane info (even on failure, pane ID is stale)
         delete paneInfo[role];
     }
 

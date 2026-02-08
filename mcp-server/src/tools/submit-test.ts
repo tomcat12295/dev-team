@@ -73,7 +73,7 @@ export async function submitTest(params: SubmitTestParams): Promise<SubmitTestRe
         const message: Message = {
             id: messageId,
             type: 'notification',
-            from: from as any,
+            from,
             to: 'leader',
             subject: `テスト提出: ${task.title}`,
             content: formatTestSubmission(params, task.title),

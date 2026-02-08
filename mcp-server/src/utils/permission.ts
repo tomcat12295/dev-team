@@ -1,5 +1,5 @@
 import { Role } from '../types/task.js';
-import { canSendTo, hasPermission, PermissionConfig } from '../config/permissions.js';
+import { canSendTo, hasPermission, PermissionConfig, PERMISSIONS } from '../config/permissions.js';
 import { isValidRole as isValidRoleFromConfig, getAllRoles, isMemberRole } from '../config/team-config.js';
 
 export function getCurrentRole(): Role {
@@ -32,9 +32,10 @@ function validatePermission(
 
 export function validateSendPermission(from: Role, to: Role): { allowed: boolean; reason?: string } {
     if (!canSendTo(from, to)) {
+        const allowedTargets = PERMISSIONS[from]?.canSendTo ?? [];
         return {
             allowed: false,
-            reason: `Role '${from}' is not allowed to send messages to '${to}'. Valid roles: ${getAllRoles().join(', ')}`,
+            reason: `Role '${from}' は '${to}' にメッセージを送信できません。送信可能: ${(allowedTargets as string[]).join(', ') || 'なし'}`,
         };
     }
     return { allowed: true };
