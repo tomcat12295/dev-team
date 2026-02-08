@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Runtime data
+.dev-team/
+
+# Test temp directories
+test-temp*/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Internal design docs
+docs/design/
+
+# Claude Code local settings (contains user paths)
+**/.claude/settings.local.json

@@ -1,0 +1,60 @@
+{
+  "name": "dev-team-mcp-server",
+  "version": "0.1.0",
+  "description": "Multi-agent development team system for Claude Code — orchestrate PM, Leader, and Member roles via MCP with WezTerm integration",
+  "main": "dist/index.js",
+  "type": "module",
+  "license": "MIT",
+  "author": "TomcaT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomcat12295/dev-team.git",
+    "directory": "mcp-server"
+  },
+  "homepage": "https://github.com/tomcat12295/dev-team#readme",
+  "bugs": {
+    "url": "https://github.com/tomcat12295/dev-team/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "claude",
+    "claude-code",
+    "automation",
+    "dev-team",
+    "multi-agent",
+    "wezterm"
+  ],
+  "bin": {
+    "dev-team": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "!dist/__tests__",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "commander": "^14.0.3",
+    "proper-lockfile": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "@types/proper-lockfile": "^4.1.4",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

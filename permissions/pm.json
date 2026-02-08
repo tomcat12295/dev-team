@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__dev-team__*",
+      "mcp__context7__*",
+      "mcp__sequential-thinking__*",
+      "WebSearch(*)",
+      "WebFetch(*)"
+    ],
+    "ask": [],
+    "deny": [],
+    "defaultMode": "bypassPermissions"
+  }
+}

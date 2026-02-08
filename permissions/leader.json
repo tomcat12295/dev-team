@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__dev-team__*",
+      "mcp__context7__*",
+      "mcp__sequential-thinking__*",
+      "Read(**)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebSearch(*)",
+      "WebFetch(*)",
+      "Task(*)"
+    ],
+    "ask": [
+      "Edit(*)",
+      "Write(*)",
+      "Bash(git push *)",
+      "Bash(rm *)"
+    ],
+    "deny": [],
+    "defaultMode": "bypassPermissions"
+  }
+}

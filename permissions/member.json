@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__dev-team__*",
+      "mcp__context7__*",
+      "mcp__sequential-thinking__*",
+      "Read(**)",
+      "Edit(**)",
+      "Write(**)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebSearch(*)",
+      "WebFetch(*)",
+      "Task(*)",
+      "Bash(./gradlew *)",
+      "Bash(gradlew.bat *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "Bash(git stash *)",
+      "Bash(ls *)",
+      "Bash(dir *)",
+      "Bash(cd *)",
+      "Bash(mkdir *)",
+      "Bash(echo *)",
+      "Bash(cat *)",
+      "Bash(type *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(rm -rf *)",
+      "Bash(del /s *)",
+      "Bash(rmdir /s *)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Read(**/secrets/**)",
+      "Read(**/*credential*)"
+    ],
+    "defaultMode": "bypassPermissions"
+  }
+}
