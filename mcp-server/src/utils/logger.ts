@@ -27,9 +27,17 @@ function shouldLog(level: LogLevel): boolean {
     return LOG_LEVEL_PRIORITY[level] >= LOG_LEVEL_PRIORITY[currentLogLevel];
 }
 
+function safeStringify(data: unknown): string {
+    try {
+        return JSON.stringify(data);
+    } catch {
+        return '[Unserializable data]';
+    }
+}
+
 function formatLog(entry: LogEntry): string {
     const rolePrefix = entry.role ? `[${entry.role}] ` : '';
-    const dataStr = entry.data ? ` ${JSON.stringify(entry.data)}` : '';
+    const dataStr = entry.data ? ` ${safeStringify(entry.data)}` : '';
     return `${entry.timestamp} [${entry.level.toUpperCase()}] ${rolePrefix}${entry.message}${dataStr}`;
 }
 

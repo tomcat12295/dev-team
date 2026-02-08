@@ -66,8 +66,7 @@ export async function sendTask(params: SendTaskParams): Promise<SendTaskResult> 
     }
 
     // leader→memberへのtype='task'送信は禁止（assign_taskを使用すべき）
-    const messageType = params.type || 'task';
-    if (from === 'leader' && isMemberRole(to) && messageType === 'task') {
+    if (from === 'leader' && isMemberRole(to) && (params.type || 'task') === 'task') {
         return {
             success: false,
             error: 'memberへのタスク割り当てには assign_task を使用してください。send_taskではreport/question/notificationのみ送信可能です。',

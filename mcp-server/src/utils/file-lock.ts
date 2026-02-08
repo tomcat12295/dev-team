@@ -16,10 +16,14 @@ const LOCK_OPTIONS = {
 export async function ensureFileExists(filePath: string): Promise<void> {
     try {
         await fs.access(filePath);
-    } catch {
-        const dir = path.dirname(filePath);
-        await fs.mkdir(dir, { recursive: true });
-        await fs.writeFile(filePath, '{}', 'utf-8');
+    } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+            const dir = path.dirname(filePath);
+            await fs.mkdir(dir, { recursive: true });
+            await fs.writeFile(filePath, '{}', 'utf-8');
+        } else {
+            throw err;
+        }
     }
 }
 

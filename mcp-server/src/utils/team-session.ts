@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { randomUUID } from 'crypto';
 import { sendTextToPane } from './wezterm.js';
 import { info, error as logError } from './logger.js';
+import type { Role } from '../types/task.js';
 
 const execAsync = promisify(exec);
 
@@ -433,11 +434,11 @@ export async function stopTeamSession(projectPath: string, options: StopTeamSess
     for (const { role } of rolePanes) {
         info(`  Stopping ${role}...`);
         try {
-            await sendTextToPane(role as any, '/exit');
+            await sendTextToPane(role as Role, '/exit');
             await sleep(500);
 
             // Exit shell
-            await sendTextToPane(role as any, 'exit');
+            await sendTextToPane(role as Role, 'exit');
         } catch (err) {
             logError(`  Warning: Failed to stop ${role}`, err);
         }

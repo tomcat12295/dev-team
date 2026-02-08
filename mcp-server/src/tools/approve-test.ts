@@ -1,6 +1,6 @@
 import { TaskPhase } from '../types/task.js';
 import { Message } from '../types/message.js';
-import { addMessage, generateId, addActivity, getDashboard, updateTaskInList, updateMemberStatus } from '../utils/queue.js';
+import { addMessage, generateMessageId, addActivity, getDashboard, updateTaskInList, updateMemberStatus } from '../utils/queue.js';
 import { notifyRole } from '../utils/wezterm.js';
 import { getCurrentRole, validateLeaderOnly } from '../utils/permission.js';
 import { validateRequiredString } from '../utils/validation.js';
@@ -61,7 +61,7 @@ export async function approveTest(params: ApproveTestParams): Promise<ApproveTes
         });
 
         // memberにメッセージを送信
-        const messageId = await generateId();
+        const messageId = generateMessageId();
         const message: Message = {
             id: messageId,
             type: 'notification',

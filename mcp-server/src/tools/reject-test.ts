@@ -60,7 +60,7 @@ export async function rejectTest(params: RejectTestParams): Promise<RejectTestRe
         const messageId = generateMessageId();
         const message: Message = {
             id: messageId,
-            type: 'task',
+            type: 'notification',
             from: 'leader',
             to: assignee,
             subject: `テスト却下: ${task.title}`,

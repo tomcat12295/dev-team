@@ -224,7 +224,7 @@ describe('reject-test', () => {
             expect(mockAddMessage).toHaveBeenCalledWith(
                 'member-01',
                 expect.objectContaining({
-                    type: 'task',
+                    type: 'notification',
                     from: 'leader',
                     to: 'member-01',
                     subject: expect.stringContaining('テスト却下'),
