@@ -13,8 +13,8 @@ const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to dev-team root (relative to dist/utils/)
-const DEV_TEAM_ROOT = path.resolve(__dirname, '..', '..', '..');
+// Path to package root (relative to dist/utils/)
+const PACKAGE_ROOT = path.resolve(__dirname, '..', '..');
 
 export interface TeamSessionConfig {
     projectPath: string;
@@ -138,9 +138,9 @@ function getSkillsForRole(role: string): string[] {
  * Create workspace directories for each role with CLAUDE.md and settings
  */
 export async function createWorkspaces(workspacesPath: string, roles: string[]): Promise<void> {
-    const promptsPath = path.join(DEV_TEAM_ROOT, 'prompts');
-    const permissionsPath = path.join(DEV_TEAM_ROOT, 'permissions');
-    const skillsTemplatePath = path.join(__dirname, '..', '..', 'templates', 'skills');
+    const promptsPath = path.join(PACKAGE_ROOT, 'templates', 'prompts');
+    const permissionsPath = path.join(PACKAGE_ROOT, 'templates', 'permissions');
+    const skillsTemplatePath = path.join(PACKAGE_ROOT, 'templates', 'skills');
 
     for (const role of roles) {
         const workspacePath = path.join(workspacesPath, role);

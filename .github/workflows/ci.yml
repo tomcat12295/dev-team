@@ -32,3 +32,76 @@ jobs:
       - name: Test
         working-directory: mcp-server
         run: npm test
+
+  package-verify:
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        working-directory: mcp-server
+        run: npm ci
+      - name: Build
+        working-directory: mcp-server
+        run: npm run build
+      - name: Verify package contents
+        working-directory: mcp-server
+        run: |
+          # npm pack --dry-run でパッケージ内容を確認
+          $output = npm pack --dry-run 2>&1
+          echo $output
+
+          # 必須ファイルの存在確認
+          $required = @(
+            'templates/prompts/pm.md',
+            'templates/prompts/leader.md',
+            'templates/prompts/member.md',
+            'templates/permissions/pm.json',
+            'templates/permissions/leader.json',
+            'templates/permissions/member.json',
+            'templates/skills/',
+            'templates/start-team-skill.md',
+            'dist/cli.js',
+            'dist/index.js'
+          )
+          foreach ($file in $required) {
+            if ($output -notmatch [regex]::Escape($file)) {
+              echo "MISSING: $file"
+              exit 1
+            }
+            echo "OK: $file"
+          }
+
+          # テストファイルが含まれないこと
+          if ($output -match '\.test\.') {
+            echo "ERROR: Test files found in package"
+            exit 1
+          }
+      - name: Install from tarball
+        working-directory: mcp-server
+        run: |
+          npm pack
+          npm install -g dev-team-mcp-server-0.1.0.tgz
+      - name: Test CLI
+        run: |
+          dev-team --version
+      - name: Test init command
+        run: |
+          mkdir $env:TEMP\test-dev-team
+          dev-team init $env:TEMP\test-dev-team
+          # 生成ファイルの確認
+          Test-Path $env:TEMP\test-dev-team\.dev-team\dashboard.json
+          Test-Path $env:TEMP\test-dev-team\.dev-team\workspaces\pm\CLAUDE.md
+          Test-Path $env:TEMP\test-dev-team\.dev-team\workspaces\leader\CLAUDE.md
+          Test-Path $env:TEMP\test-dev-team\.dev-team\workspaces\member-01\CLAUDE.md
+          Test-Path $env:TEMP\test-dev-team\.dev-team\workspaces\member-02\CLAUDE.md
+          Test-Path "$env:TEMP\test-dev-team\.claude\skills\start-team\SKILL.md"
+      - name: Cleanup
+        if: always()
+        run: |
+          npm uninstall -g dev-team-mcp-server
+          if (Test-Path $env:TEMP\test-dev-team) { Remove-Item -Recurse -Force $env:TEMP\test-dev-team }

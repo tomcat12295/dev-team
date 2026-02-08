@@ -31,12 +31,15 @@
   "files": [
     "dist",
     "!dist/__tests__",
+    "!dist/**/*.test.*",
     "templates"
   ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc --watch",

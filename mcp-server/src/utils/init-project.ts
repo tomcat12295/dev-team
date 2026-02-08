@@ -32,7 +32,7 @@ export async function initProject(
 
     // Get paths to source files
     const mcpServerRoot = path.resolve(__dirname, '..', '..');
-    const promptsDir = path.join(mcpServerRoot, 'prompts');
+    const promptsDir = path.join(mcpServerRoot, 'templates', 'prompts');
     const templatesDir = path.join(mcpServerRoot, 'templates');
 
     // Read template and prompt files first to fail early if missing
