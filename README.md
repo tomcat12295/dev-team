@@ -128,24 +128,43 @@ npx dev-team add-member "C:\dev\my-project" --count 1
 npx dev-team stop "C:\dev\my-project"
 ```
 
+## ダッシュボードの確認
+
+プロジェクトの進捗はダッシュボードで確認できます。
+
+### MCPツールで確認
+
+PMペインで `get_dashboard` ツールを使用します。`summary` モードでタスク数のみ、`tasks_only` でタスク一覧のみ、`full`（デフォルト）で全情報を取得できます。
+
+### ファイルを直接確認
+
+ダッシュボードはプロジェクト内の以下のファイルに出力されています：
+
+- **Markdown表示**: `.dev-team/status/dashboard.md` — エディタやビューワーで閲覧しやすい形式
+- **JSON形式**: `.dev-team/status/dashboard.json` — プログラムから参照する場合
+
 ## ディレクトリ構造
 
-### 共通設定（この場所）
+### リポジトリ構造
 ```
 dev-team/
 ├── docs/                 # ドキュメント
-│   ├── design/           # 設計ドキュメント
-│   └── tools.md          # MCPツール詳細
-├── prompts/              # 役割ごとの指示書
-│   ├── pm.md
-│   ├── leader.md
-│   └── member.md
+│   ├── tools.md          # MCPツール詳細
+│   ├── system-features.md # システム機能詳細
+│   └── release-guide.md  # リリース手順
 ├── mcp-server/           # MCPサーバー・CLI（ツール提供）
 │   ├── src/              # TypeScriptソース
 │   │   ├── cli.ts        # CLIエントリポイント
+│   │   ├── tools/        # MCPツール実装
 │   │   └── ...
+│   ├── templates/        # テンプレート
+│   │   ├── prompts/      # 役割ごとの指示書
+│   │   ├── permissions/  # 権限設定
+│   │   └── skills/       # スキル定義
 │   ├── dist/             # ビルド済みJS
 │   └── package.json
+├── CHANGELOG.md
+├── LICENSE
 └── README.md
 ```
 
@@ -312,7 +331,7 @@ PMは `configure_modes` で開発フローを切り替えられます。
 - PMが承認するまでタスクは分配されない
 - 重要な分割判断にPMの関与が必要な場合に使用
 
-### タスク種別（task_type）
+## タスク種別
 
 `assign_task` で `task_type` を指定してタスクの種類を設定できます。
 
@@ -326,14 +345,14 @@ PMは `configure_modes` で開発フローを切り替えられます。
 | `test_plan` | テストプラン/テスト設計 | 必須 |
 | `test_implementation` | テスト実装タスク | 必須 |
 
-#### 調査タスク（investigation）の特徴
+### 調査タスク（investigation）の特徴
 
 - **計画提出不要**: `submit_plan` をスキップして即座に調査開始
 - **ファイル編集禁止**: 読み取りのみ許可
 - **レビューモードの影響なし**: strictモードでもテストレビュー不要
 - 完了後は `send_task(type='report')` で結果を報告
 
-#### compact自動送信
+### compact自動送信
 
 実装タスク（`implementation`または未指定）の割り当て時、自動で`/compact`が送信されます。メンバーは入力待ち状態のため確実に実行されます。
 
