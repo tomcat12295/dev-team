@@ -12,6 +12,15 @@ const __dirname = dirname(__filename);
 const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
 export const CLI_VERSION: string = pkg.version;
 
+function parsePositiveInt(value: string, defaultValue: number, min: number, max: number): number {
+    const num = parseInt(value, 10);
+    if (isNaN(num) || num < min || num > max) {
+        console.error(`Invalid number: ${value} (must be ${min}-${max})`);
+        process.exit(1);
+    }
+    return num;
+}
+
 export const program = new Command();
 
 program
@@ -28,7 +37,7 @@ program
     .action(async (projectPath: string, initialTask?: string, options?: { members?: string }) => {
         try {
             const absolutePath = path.resolve(projectPath);
-            const memberCount = parseInt(options?.members || '2', 10);
+            const memberCount = parsePositiveInt(options?.members || '2', 2, 1, 4);
 
             await startTeamSession({
                 projectPath: absolutePath,
@@ -67,7 +76,7 @@ program
     .action(async (projectPath: string, options?: { count?: string }) => {
         try {
             const absolutePath = path.resolve(projectPath);
-            const count = parseInt(options?.count || '1', 10);
+            const count = parsePositiveInt(options?.count || '1', 1, 1, 4);
 
             const result = await addMember({
                 projectPath: absolutePath,
@@ -92,7 +101,7 @@ program
     .action(async (projectPath: string, options?: { count?: string }) => {
         try {
             const absolutePath = path.resolve(projectPath);
-            const count = parseInt(options?.count || '1', 10);
+            const count = parsePositiveInt(options?.count || '1', 1, 1, 4);
 
             const result = await removeMember(absolutePath, { count });
 
@@ -111,12 +120,15 @@ program
     .description('Init dev team project structure')
     .argument('[projectPath]', 'Path to the project directory', '.')
     .option('-f, --force', 'Overwrite existing files')
-    .action(async (projectPath: string, options?: { force?: boolean }) => {
+    .option('-m, --members <count>', 'Number of members (default: 2)', '2')
+    .action(async (projectPath: string, options?: { force?: boolean; members?: string }) => {
         try {
             const absolutePath = path.resolve(projectPath);
+            const memberCount = parsePositiveInt(options?.members || '2', 2, 1, 4);
 
             await initProject(absolutePath, {
                 force: options?.force,
+                memberCount,
             });
 
             console.log('Successfully initialized dev team project');

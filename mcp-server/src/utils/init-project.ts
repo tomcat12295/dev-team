@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 
 export interface InitProjectOptions {
     force?: boolean;
+    memberCount?: number;
 }
 
 export async function initProject(
@@ -35,22 +36,46 @@ export async function initProject(
     const promptsDir = path.join(mcpServerRoot, 'templates', 'prompts');
     const templatesDir = path.join(mcpServerRoot, 'templates');
 
+    const memberCount = options.memberCount ?? 2;
+
     // Read template and prompt files first to fail early if missing
-    const templateContent = await fs.readFile(
-        path.join(templatesDir, 'start-team-skill.md'),
-        'utf-8'
-    );
-    const pmPrompt = await fs.readFile(path.join(promptsDir, 'pm.md'), 'utf-8');
-    const leaderPrompt = await fs.readFile(path.join(promptsDir, 'leader.md'), 'utf-8');
-    const memberPrompt = await fs.readFile(path.join(promptsDir, 'member.md'), 'utf-8');
+    let templateContent: string;
+    try {
+        templateContent = await fs.readFile(
+            path.join(templatesDir, 'start-team-skill.md'),
+            'utf-8'
+        );
+    } catch {
+        throw new Error(`Template file not found: ${path.join(templatesDir, 'start-team-skill.md')}. Ensure the package is installed correctly.`);
+    }
+
+    let pmPrompt: string;
+    let leaderPrompt: string;
+    let memberPrompt: string;
+    try {
+        pmPrompt = await fs.readFile(path.join(promptsDir, 'pm.md'), 'utf-8');
+    } catch {
+        throw new Error(`Template file not found: ${path.join(promptsDir, 'pm.md')}. Ensure the package is installed correctly.`);
+    }
+    try {
+        leaderPrompt = await fs.readFile(path.join(promptsDir, 'leader.md'), 'utf-8');
+    } catch {
+        throw new Error(`Template file not found: ${path.join(promptsDir, 'leader.md')}. Ensure the package is installed correctly.`);
+    }
+    try {
+        memberPrompt = await fs.readFile(path.join(promptsDir, 'member.md'), 'utf-8');
+    } catch {
+        throw new Error(`Template file not found: ${path.join(promptsDir, 'member.md')}. Ensure the package is installed correctly.`);
+    }
 
     // Read skill templates
     const skillsDir = path.join(templatesDir, 'skills');
     const roleSkills: Record<string, string[]> = {
         'leader': ['strict-review', 'review-plan', 'review-code'],
-        'member-01': ['strict-workflow', 'tdd', 'report-template'],
-        'member-02': ['strict-workflow', 'tdd', 'report-template'],
     };
+    for (let i = 1; i <= memberCount; i++) {
+        roleSkills[`member-${String(i).padStart(2, '0')}`] = ['strict-workflow', 'tdd', 'report-template'];
+    }
     const allSkillNames = [...new Set(Object.values(roleSkills).flat())];
     const skillContents: Record<string, string> = {};
     for (const skillName of allSkillNames) {
@@ -61,7 +86,7 @@ export async function initProject(
     }
 
     // Create directory structure
-    const workspaceDirs = ['pm', 'leader', 'member-01', 'member-02'];
+    const workspaceDirs = ['pm', 'leader', ...Array.from({length: memberCount}, (_, i) => `member-${String(i + 1).padStart(2, '0')}`)];
 
     // Create .dev-team directories
     await fs.mkdir(devTeamDir, { recursive: true });
@@ -94,14 +119,12 @@ export async function initProject(
         path.join(devTeamDir, 'workspaces', 'leader', 'CLAUDE.md'),
         leaderPrompt
     );
-    await fs.writeFile(
-        path.join(devTeamDir, 'workspaces', 'member-01', 'CLAUDE.md'),
-        memberPrompt
-    );
-    await fs.writeFile(
-        path.join(devTeamDir, 'workspaces', 'member-02', 'CLAUDE.md'),
-        memberPrompt
-    );
+    for (let i = 1; i <= memberCount; i++) {
+        await fs.writeFile(
+            path.join(devTeamDir, 'workspaces', `member-${String(i).padStart(2, '0')}`, 'CLAUDE.md'),
+            memberPrompt
+        );
+    }
 
     // Create SKILL.md with PROJECT_PATH replaced
     const skillContent = templateContent.replace(/\{\{PROJECT_PATH\}\}/g, absoluteProjectPath);

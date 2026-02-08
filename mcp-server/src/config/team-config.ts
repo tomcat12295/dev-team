@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { debug } from '../utils/logger.js';
 
 export interface MemberPermissionTemplate {
     canSendTo: string[];
@@ -74,12 +75,14 @@ export function getTeamConfig(): TeamConfig {
     const projectPath = process.env.DEV_TEAM_PROJECT_PATH;
 
     if (!projectPath) {
+        debug('DEV_TEAM_PROJECT_PATH not set, using default config');
         return DEFAULT_CONFIG;
     }
 
     const configPath = path.join(projectPath, '.dev-team', 'config', 'team.json');
 
     if (!fs.existsSync(configPath)) {
+        debug(`Config file not found: ${configPath}, using default config`);
         return DEFAULT_CONFIG;
     }
 
@@ -88,11 +91,13 @@ export function getTeamConfig(): TeamConfig {
         const parsed = JSON.parse(content);
 
         if (!isValidConfig(parsed)) {
+            debug('Config validation failed, using default config');
             return DEFAULT_CONFIG;
         }
 
         return parsed;
     } catch {
+        debug('Failed to read/parse config, using default config');
         return DEFAULT_CONFIG;
     }
 }

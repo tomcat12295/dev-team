@@ -1,6 +1,6 @@
 import { TaskPriority, TaskType } from '../types/task.js';
 import { getCurrentRole, validateLeaderOnly } from '../utils/permission.js';
-import { validateRequiredString, validateRequiredArray } from '../utils/validation.js';
+import { validateRequiredString, validateRequiredArray, validateEnumValue } from '../utils/validation.js';
 import { getDashboard, addApprovalRequest } from '../utils/queue.js';
 import { getTaskSplitApproval } from '../utils/memory.js';
 import { assignTask, AssignTaskResult } from './assign-task.js';
@@ -197,6 +197,25 @@ export async function distributeTasks(params: DistributeTasksParams): Promise<Di
             });
             failureCount++;
             continue;
+        }
+
+        // Validate enum fields if specified
+        if (subtask.priority) {
+            const priorityCheck = validateEnumValue(subtask.priority, ['high', 'medium', 'low'], 'priority');
+            if (!priorityCheck.valid) {
+                results.push({ title: subtask.title, success: false, error: priorityCheck.error });
+                failureCount++;
+                continue;
+            }
+        }
+        if (subtask.task_type) {
+            const taskTypeCheck = validateEnumValue(subtask.task_type,
+                ['investigation', 'implementation', 'review', 'documentation', 'plan', 'test_plan', 'test_implementation'], 'task_type');
+            if (!taskTypeCheck.valid) {
+                results.push({ title: subtask.title, success: false, error: taskTypeCheck.error });
+                failureCount++;
+                continue;
+            }
         }
 
         const criteriaCheck = validateRequiredArray(subtask.acceptance_criteria, 'acceptance_criteria');

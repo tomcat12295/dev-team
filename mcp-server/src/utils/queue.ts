@@ -171,7 +171,7 @@ async function writeDashboard(dashboard: Dashboard): Promise<void> {
     }
     dashWriteTimer = setTimeout(() => {
         dashWriteTimer = null;
-        flushDashboard();
+        void flushDashboard();
     }, 500);
 }
 

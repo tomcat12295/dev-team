@@ -1,6 +1,7 @@
 import { updateApprovalStatus, addActivity } from '../utils/queue.js';
 import { getCurrentRole, validateProcessApprovalPermission } from '../utils/permission.js';
 import { info, error, warn } from '../utils/logger.js';
+import { validateRequiredString, validateEnumValue } from '../utils/validation.js';
 import type { ApprovalRequest } from '../types/task.js';
 import { assignTaskCore } from './assign-task.js';
 import { sendTask } from './send-task.js';
@@ -30,6 +31,13 @@ export async function processApproval(params: ProcessApprovalParams): Promise<Pr
             error: permission.reason,
         };
     }
+
+    // Validate inputs
+    const idCheck = validateRequiredString(params.approval_id, 'approval_id');
+    if (!idCheck.valid) return { success: false, error: idCheck.error };
+
+    const actionCheck = validateEnumValue(params.action, ['approve', 'reject'], 'action');
+    if (!actionCheck.valid) return { success: false, error: actionCheck.error };
 
     try {
         // Convert action to status
@@ -141,7 +149,7 @@ async function handleMemberIncreaseApproval(approval: ApprovalRequest): Promise<
 
     const metadata = approval.metadata as MemberIncreaseMetadata | undefined;
 
-    if (!metadata || !metadata.requestedCount || metadata.requestedCount <= 0) {
+    if (!metadata || metadata.requestedCount == null || metadata.requestedCount <= 0) {
         warn('Invalid metadata for member_increase approval', { metadata });
         return;
     }
@@ -177,7 +185,7 @@ async function handleMemberDecreaseApproval(approval: ApprovalRequest): Promise<
 
     const metadata = approval.metadata as MemberDecreaseMetadata | undefined;
 
-    if (!metadata || !metadata.requestedCount || metadata.requestedCount <= 0) {
+    if (!metadata || metadata.requestedCount == null || metadata.requestedCount <= 0) {
         warn('Invalid metadata for member_decrease approval', { metadata });
         return;
     }
