@@ -86,7 +86,9 @@ jobs:
         working-directory: mcp-server
         run: |
           npm pack
-          npm install -g dev-team-mcp-server-0.1.0.tgz
+          $tgz = Get-ChildItem dev-team-mcp-server-*.tgz | Select-Object -First 1
+          echo "Installing $($tgz.Name)"
+          npm install -g $tgz.FullName
       - name: Test CLI
         run: |
           dev-team --version
