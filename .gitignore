@@ -28,8 +28,9 @@ test-temp*/
 .DS_Store
 Thumbs.db
 
-# Internal design docs
+# Internal docs
 docs/design/
+docs/release-guide.md
 
 # Claude Code local settings (contains user paths)
 **/.claude/settings.local.json
