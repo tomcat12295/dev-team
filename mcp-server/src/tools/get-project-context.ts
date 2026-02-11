@@ -17,8 +17,6 @@ const VALID_SECTIONS: ProjectContextSection[] = [
     'who',
     'constraints',
     'current_state',
-    'decisions',
-    'notes',
     'preferences',
 ];
 
@@ -75,8 +73,6 @@ export function formatGetProjectContextResult(result: GetProjectContextResult): 
         who: 'Who（ステークホルダー）',
         constraints: 'Constraints（制約）',
         current_state: 'Current State（現在の状態）',
-        decisions: 'Decisions（決定事項）',
-        notes: 'Notes（備考）',
         preferences: 'Preferences（ユーザー設定）',
     };
 
@@ -98,8 +94,6 @@ export function formatGetProjectContextResult(result: GetProjectContextResult): 
     output += `## Who（ステークホルダー）\n${context.who}\n\n`;
     output += `## Constraints（制約）\n${context.constraints}\n\n`;
     output += `## Current State（現在の状態）\n${context.currentState}\n\n`;
-    output += `## Decisions（決定事項）\n${context.decisions}\n\n`;
-    output += `## Notes（備考）\n${context.notes}\n\n`;
     output += `## Preferences（ユーザー設定）\n${context.preferences}\n`;
 
     return output;

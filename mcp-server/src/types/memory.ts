@@ -18,8 +18,6 @@ export type ProjectContextSection =
     | 'who'
     | 'constraints'
     | 'current_state'
-    | 'decisions'
-    | 'notes'
     | 'preferences';
 
 export interface ProjectContext {
@@ -28,8 +26,6 @@ export interface ProjectContext {
     who: string;
     constraints: string;
     currentState: string;
-    decisions: string;
-    notes: string;
     preferences: string;
     lastUpdated: string;
 }

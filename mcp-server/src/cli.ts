@@ -31,7 +31,7 @@ program
 program
     .command('start')
     .description('Start dev team session')
-    .argument('<projectPath>', 'Path to the project directory')
+    .argument('[projectPath]', 'Path to the project directory', '.')
     .argument('[initialTask]', 'Initial task for PM')
     .option('-m, --members <count>', 'Number of members (default: 2)', '2')
     .action(async (projectPath: string, initialTask?: string, options?: { members?: string }) => {
@@ -53,7 +53,7 @@ program
 program
     .command('stop')
     .description('Stop dev team session')
-    .argument('<projectPath>', 'Path to the project directory')
+    .argument('[projectPath]', 'Path to the project directory', '.')
     .option('--delete-queue', 'Delete queue files (default: keep)')
     .action(async (projectPath: string, options?: { deleteQueue?: boolean }) => {
         try {
@@ -71,7 +71,7 @@ program
 program
     .command('add-member')
     .description('Add members to an existing team session')
-    .argument('<projectPath>', 'Path to the project directory')
+    .argument('[projectPath]', 'Path to the project directory', '.')
     .option('-c, --count <count>', 'Number of members to add (default: 1)', '1')
     .action(async (projectPath: string, options?: { count?: string }) => {
         try {
@@ -96,7 +96,7 @@ program
 program
     .command('remove-member')
     .description('Remove members from an existing team session')
-    .argument('<projectPath>', 'Path to the project directory')
+    .argument('[projectPath]', 'Path to the project directory', '.')
     .option('-c, --count <count>', 'Number of members to remove (default: 1)', '1')
     .action(async (projectPath: string, options?: { count?: string }) => {
         try {

@@ -54,6 +54,7 @@
 ## ワークフロー
 
 1. 起動時: `get_dashboard` → `check_queue` → `get_project_context` → `recall_memory(limit=5)`
+   - What/Why/Who/Constraintsが未設定なら社長に確認して初期設定する
 2. ユーザー指示 → タスク分解 → `send_task`でleaderに依頼
 3. 通知待ち（ポーリング禁止）
 4. 報告受信 → `check_queue` → `update_task_status`
@@ -79,12 +80,26 @@ leaderからの承認依頼（設計等）: `process_approval(approval_id, actio
 - 課題: [課題] - [対応策]
 ```
 
-## 決定事項の記録
+## 情報の記録ルール
 
-```
-save_memory(type="decision", title="[内容]", content="[説明]", tags=["management"])
-update_project_context(section="[セクション]", content="[内容]")
-```
+### Project Context（起動時に全員が読む概要情報）
+プロジェクト概要や制約に関わる情報を記録:
+- プロジェクト概要変更: `update_project_context(section="what"/"why"/"who"/"constraints", content="...")`
+- 例: プロジェクト概要、チーム構成、技術的制約
+
+### Memory（検索して参照するナレッジベース）
+日常の運用ルールや技術知見を記録:
+- 運用ルール: `save_memory(type="decision", title="...", content="...", tags=[...])`
+- 技術メモ: `save_memory(type="note", title="...", content="...", tags=[...])`
+- 例: タスク分割ルール、コミット規約、トラブルシュート知見
+
+### 判断基準
+| 問い | Yes → Project Context | No → Memory |
+|------|----------------------|-------------|
+| 新メンバーが起動時に知るべき？ | ✅ | - |
+| プロジェクトの概要・制約に関わる？ | ✅ | - |
+| 日常の運用ルール・手順？ | - | ✅ |
+| 技術的なTips・知見？ | - | ✅ |
 
 ## Compact Instructions
 

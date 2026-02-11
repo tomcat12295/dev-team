@@ -37,12 +37,6 @@ const PROJECT_CONTEXT_TEMPLATE = `# Project Context
 ## Current State
 （未設定）
 
-## Decisions
-（未設定）
-
-## Notes
-（未設定）
-
 ## Preferences
 （未設定）
 `;
@@ -54,8 +48,6 @@ const SECTION_HEADERS: Record<ProjectContextSection, string> = {
     'who': 'Who',
     'constraints': 'Constraints',
     'current_state': 'Current State',
-    'decisions': 'Decisions',
-    'notes': 'Notes',
     'preferences': 'Preferences',
 };
 
@@ -66,8 +58,6 @@ const SECTION_ORDER: ProjectContextSection[] = [
     'who',
     'constraints',
     'current_state',
-    'decisions',
-    'notes',
     'preferences',
 ];
 
@@ -106,7 +96,28 @@ export async function ensureMemoryStructure(): Promise<void> {
 }
 
 /**
- * メモリを保存（JSONL形式で追記）
+ * メモリ保存結果
+ */
+export interface SaveMemoryOutcome {
+    entry: MemoryEntry;
+    updated: boolean;
+}
+
+/**
+ * titleを正規化して重複判定に使用する
+ * 比較時のみ使用し、保存するtitle自体は元の値を保持
+ */
+function normalizeTitle(title: string): string {
+    return title
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/[Ａ-Ｚａ-ｚ０-９]/g,
+            s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+}
+
+/**
+ * メモリを保存（JSONL形式で追記、重複時は上書き更新）
+ * 重複判定: type と normalizeTitle(title) が一致
  */
 export async function saveMemory(
     role: Role,
@@ -114,29 +125,63 @@ export async function saveMemory(
     title: string,
     content: string,
     tags?: string[]
-): Promise<MemoryEntry> {
+): Promise<SaveMemoryOutcome> {
     const memoriesPath = getMemoriesPath();
     await ensureFileExists(memoriesPath);
 
-    const id = generateMessageId();
-    const entry: MemoryEntry = {
-        id: `memory-${id}`,
-        timestamp: new Date().toISOString(),
-        role,
-        type,
-        title,
-        content,
-        tags,
-    };
+    let resultEntry: MemoryEntry;
+    let updated = false;
 
     await withFileLock(memoriesPath, async () => {
-        // JSONL形式で追記
-        const line = JSON.stringify(entry) + '\n';
-        await fs.appendFile(memoriesPath, line, 'utf-8');
+        // 既存エントリを読み取り
+        const fileContent = await fs.readFile(memoriesPath, 'utf-8');
+        const lines = fileContent.trim().split('\n').filter(line => line.length > 0);
+        const entries: MemoryEntry[] = [];
+        for (const line of lines) {
+            try {
+                entries.push(JSON.parse(line) as MemoryEntry);
+            } catch {
+                // パース失敗行はスキップ
+            }
+        }
+
+        // 重複チェック: type + normalizeTitle(title) が一致
+        const normalizedTitle = normalizeTitle(title);
+        const duplicateIndex = entries.findIndex(e => e.type === type && normalizeTitle(e.title) === normalizedTitle);
+
+        if (duplicateIndex >= 0) {
+            // 重複あり: 既存エントリを上書き更新（IDは維持）
+            const existing = entries[duplicateIndex];
+            existing.content = content;
+            existing.timestamp = new Date().toISOString();
+            existing.role = role;
+            existing.tags = tags;
+
+            // JSONL全体を再書き込み
+            const newContent = entries.map(e => JSON.stringify(e)).join('\n') + '\n';
+            await fs.writeFile(memoriesPath, newContent, 'utf-8');
+
+            resultEntry = existing;
+            updated = true;
+        } else {
+            // 重複なし: 新規追記
+            const id = generateMessageId();
+            resultEntry = {
+                id: `memory-${id}`,
+                timestamp: new Date().toISOString(),
+                role,
+                type,
+                title,
+                content,
+                tags,
+            };
+            const line = JSON.stringify(resultEntry) + '\n';
+            await fs.appendFile(memoriesPath, line, 'utf-8');
+        }
     });
 
-    info(`Memory saved: ${entry.id}`, { type, title, role });
-    return entry;
+    info(`Memory ${updated ? 'updated' : 'saved'}: ${resultEntry!.id}`, { type, title, role });
+    return { entry: resultEntry!, updated };
 }
 
 /**
@@ -218,8 +263,6 @@ export async function getProjectContext(): Promise<ProjectContext> {
             who: '（未設定）',
             constraints: '（未設定）',
             currentState: '（未設定）',
-            decisions: '（未設定）',
-            notes: '（未設定）',
             preferences: '（未設定）',
             lastUpdated: new Date().toISOString(),
         };
@@ -238,8 +281,6 @@ function parseProjectContext(markdown: string): ProjectContext {
         who: '',
         constraints: '',
         currentState: '',
-        decisions: '',
-        notes: '',
         preferences: '',
         lastUpdated: new Date().toISOString(),
     };
@@ -288,12 +329,6 @@ function parseProjectContext(markdown: string): ProjectContext {
                     break;
                 case 'current_state':
                     context.currentState = sectionContent;
-                    break;
-                case 'decisions':
-                    context.decisions = sectionContent;
-                    break;
-                case 'notes':
-                    context.notes = sectionContent;
                     break;
                 case 'preferences':
                     context.preferences = sectionContent;

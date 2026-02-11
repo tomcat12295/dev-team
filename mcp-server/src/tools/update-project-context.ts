@@ -16,8 +16,6 @@ const VALID_SECTIONS: ProjectContextSection[] = [
     'who',
     'constraints',
     'current_state',
-    'decisions',
-    'notes',
     'preferences',
 ];
 
@@ -91,8 +89,6 @@ export function formatUpdateProjectContextResult(
         who: 'Who（ステークホルダー）',
         constraints: 'Constraints（制約）',
         current_state: 'Current State（現在の状態）',
-        decisions: 'Decisions（決定事項）',
-        notes: 'Notes（備考）',
         preferences: 'Preferences（ユーザー設定）',
     };
 
