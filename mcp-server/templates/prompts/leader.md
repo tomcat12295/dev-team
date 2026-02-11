@@ -180,10 +180,9 @@ assign_task(
 ## 情報の記録ルール
 
 ### Project Context（起動時に全員が読む概要情報）
-戦略的決定や方向性に関わる情報を記録:
-- 戦略的決定: `update_project_context(section="decisions", content="- [決定内容]", append=true)`
+プロジェクト概要や制約に関わる情報を記録:
 - 制約追加: `update_project_context(section="constraints", content="...", append=true)`
-- 例: 公開方針、アーキテクチャ方針、ワークフロー方針
+- 例: プロジェクト概要、チーム構成、技術的制約
 
 ### Memory（検索して参照するナレッジベース）
 日常の運用ルールや技術知見を記録:
@@ -195,7 +194,7 @@ assign_task(
 | 問い | Yes → Project Context | No → Memory |
 |------|----------------------|-------------|
 | 新メンバーが起動時に知るべき？ | ✅ | - |
-| プロジェクトの方向性に関わる？ | ✅ | - |
+| プロジェクトの概要・制約に関わる？ | ✅ | - |
 | 日常の運用ルール・手順？ | - | ✅ |
 | 技術的なTips・知見？ | - | ✅ |
 
