@@ -114,8 +114,20 @@ export interface SaveMemoryOutcome {
 }
 
 /**
+ * titleを正規化して重複判定に使用する
+ * 比較時のみ使用し、保存するtitle自体は元の値を保持
+ */
+function normalizeTitle(title: string): string {
+    return title
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/[Ａ-Ｚａ-ｚ０-９]/g,
+            s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+}
+
+/**
  * メモリを保存（JSONL形式で追記、重複時は上書き更新）
- * 重複判定: type と title が完全一致
+ * 重複判定: type と normalizeTitle(title) が一致
  */
 export async function saveMemory(
     role: Role,
@@ -143,8 +155,9 @@ export async function saveMemory(
             }
         }
 
-        // 重複チェック: type + title が完全一致
-        const duplicateIndex = entries.findIndex(e => e.type === type && e.title === title);
+        // 重複チェック: type + normalizeTitle(title) が一致
+        const normalizedTitle = normalizeTitle(title);
+        const duplicateIndex = entries.findIndex(e => e.type === type && normalizeTitle(e.title) === normalizedTitle);
 
         if (duplicateIndex >= 0) {
             // 重複あり: 既存エントリを上書き更新（IDは維持）
