@@ -364,6 +364,68 @@ describe('memory - saveMemory 重複チェック', () => {
         expect(writtenEntry.content).toBe('新しい内容');
     });
 
+    it('前後空白が異なるtitleは重複と判定される（title正規化）', async () => {
+        const existingEntry: MemoryEntry = {
+            id: 'memory-trim-id',
+            timestamp: '2026-01-01T00:00:00.000Z',
+            role: 'pm' as any,
+            type: 'decision',
+            title: 'タイトル',
+            content: '元の内容',
+        };
+        mockReadFile.mockResolvedValue(JSON.stringify(existingEntry) + '\n');
+
+        const result = await saveMemory('pm', 'decision', '  タイトル  ', '更新内容');
+
+        expect(result.updated).toBe(true);
+        expect(result.entry.id).toBe('memory-trim-id');
+        expect(result.entry.content).toBe('更新内容');
+        // 保存されるtitleは元の値（正規化しない）
+        expect(result.entry.title).toBe('タイトル');
+        expect(mockWriteFile).toHaveBeenCalled();
+    });
+
+    it('連続空白の違いは重複と判定される（title正規化）', async () => {
+        const existingEntry: MemoryEntry = {
+            id: 'memory-space-id',
+            timestamp: '2026-01-01T00:00:00.000Z',
+            role: 'leader' as any,
+            type: 'note',
+            title: 'タイトル A',
+            content: '元の内容',
+        };
+        mockReadFile.mockResolvedValue(JSON.stringify(existingEntry) + '\n');
+
+        const result = await saveMemory('leader', 'note', 'タイトル  A', '更新内容');
+
+        expect(result.updated).toBe(true);
+        expect(result.entry.id).toBe('memory-space-id');
+        expect(result.entry.content).toBe('更新内容');
+        expect(result.entry.title).toBe('タイトル A');
+        expect(mockWriteFile).toHaveBeenCalled();
+    });
+
+    it('全角英数字と半角英数字は重複と判定される（title正規化）', async () => {
+        const existingEntry: MemoryEntry = {
+            id: 'memory-zenkaku-id',
+            timestamp: '2026-01-01T00:00:00.000Z',
+            role: 'pm' as any,
+            type: 'decision',
+            title: 'ルールＡ',
+            content: '元の内容',
+        };
+        mockReadFile.mockResolvedValue(JSON.stringify(existingEntry) + '\n');
+
+        const result = await saveMemory('pm', 'decision', 'ルールA', '更新内容');
+
+        expect(result.updated).toBe(true);
+        expect(result.entry.id).toBe('memory-zenkaku-id');
+        expect(result.entry.content).toBe('更新内容');
+        // 既存エントリのtitleが保持される
+        expect(result.entry.title).toBe('ルールＡ');
+        expect(mockWriteFile).toHaveBeenCalled();
+    });
+
     it('複数エントリがある場合、正しいエントリのみ更新されること', async () => {
         const entry1: MemoryEntry = {
             id: 'memory-id-1',
