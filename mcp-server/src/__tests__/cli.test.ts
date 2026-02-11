@@ -36,25 +36,38 @@ describe('CLI', () => {
             expect(stopCommand?.description()).toContain('Stop');
         });
 
-        it('startコマンドはprojectPath引数を持つ', async () => {
+        it('startコマンドはprojectPath引数がオプショナルである', async () => {
             const { program } = await import('../cli.js');
             const startCommand = program.commands.find(cmd => cmd.name() === 'start');
-            // commanderでは最初の引数はargs[0]
             const args = startCommand?.registeredArguments;
             expect(args).toBeDefined();
             expect(args?.length).toBeGreaterThanOrEqual(1);
             expect(args?.[0].name()).toBe('projectPath');
-            expect(args?.[0].required).toBe(true);
+            expect(args?.[0].required).toBe(false);
         });
 
-        it('stopコマンドはprojectPath引数を持つ', async () => {
+        it('startコマンドのprojectPathデフォルト値が"."である', async () => {
+            const { program } = await import('../cli.js');
+            const startCommand = program.commands.find(cmd => cmd.name() === 'start');
+            const args = startCommand?.registeredArguments;
+            expect(args?.[0].defaultValue).toBe('.');
+        });
+
+        it('stopコマンドはprojectPath引数がオプショナルである', async () => {
             const { program } = await import('../cli.js');
             const stopCommand = program.commands.find(cmd => cmd.name() === 'stop');
             const args = stopCommand?.registeredArguments;
             expect(args).toBeDefined();
             expect(args?.length).toBeGreaterThanOrEqual(1);
             expect(args?.[0].name()).toBe('projectPath');
-            expect(args?.[0].required).toBe(true);
+            expect(args?.[0].required).toBe(false);
+        });
+
+        it('stopコマンドのprojectPathデフォルト値が"."である', async () => {
+            const { program } = await import('../cli.js');
+            const stopCommand = program.commands.find(cmd => cmd.name() === 'stop');
+            const args = stopCommand?.registeredArguments;
+            expect(args?.[0].defaultValue).toBe('.');
         });
 
         it('stopコマンドに--delete-queueオプションがある', async () => {
@@ -67,6 +80,33 @@ describe('CLI', () => {
             expect(deleteQueueOption).toBeDefined();
         });
 
+        it('add-memberコマンドが定義されている', async () => {
+            const { program } = await import('../cli.js');
+            const addMemberCommand = program.commands.find(cmd => cmd.name() === 'add-member');
+            expect(addMemberCommand).toBeDefined();
+            expect(addMemberCommand?.description()).toContain('Add');
+        });
+
+        it('add-memberコマンドはprojectPath引数がオプショナルである', async () => {
+            const { program } = await import('../cli.js');
+            const addMemberCommand = program.commands.find(cmd => cmd.name() === 'add-member');
+            const args = addMemberCommand?.registeredArguments;
+            expect(args).toBeDefined();
+            expect(args?.length).toBeGreaterThanOrEqual(1);
+            expect(args?.[0].name()).toBe('projectPath');
+            expect(args?.[0].required).toBe(false);
+        });
+
+        it('add-memberコマンドに--countオプションがある', async () => {
+            const { program } = await import('../cli.js');
+            const addMemberCommand = program.commands.find(cmd => cmd.name() === 'add-member');
+            const options = addMemberCommand?.options;
+            const countOption = options?.find(
+                opt => opt.long === '--count'
+            );
+            expect(countOption).toBeDefined();
+        });
+
         it('remove-memberコマンドが定義されている', async () => {
             const { program } = await import('../cli.js');
             const removeMemberCommand = program.commands.find(cmd => cmd.name() === 'remove-member');
@@ -74,14 +114,14 @@ describe('CLI', () => {
             expect(removeMemberCommand?.description()).toContain('Remove');
         });
 
-        it('remove-memberコマンドはprojectPath引数を持つ', async () => {
+        it('remove-memberコマンドはprojectPath引数がオプショナルである', async () => {
             const { program } = await import('../cli.js');
             const removeMemberCommand = program.commands.find(cmd => cmd.name() === 'remove-member');
             const args = removeMemberCommand?.registeredArguments;
             expect(args).toBeDefined();
             expect(args?.length).toBeGreaterThanOrEqual(1);
             expect(args?.[0].name()).toBe('projectPath');
-            expect(args?.[0].required).toBe(true);
+            expect(args?.[0].required).toBe(false);
         });
 
         it('remove-memberコマンドに--countオプションがある', async () => {

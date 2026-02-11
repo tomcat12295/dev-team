@@ -31,8 +31,10 @@ user-invocable: true
 npx dev-team start "{{PROJECT_PATH}}" "$ARGUMENTS"
 ```
 
-- `{{PROJECT_PATH}}`: このプロジェクトのパス
+- `{{PROJECT_PATH}}`: このプロジェクトのパス（省略時はカレントディレクトリが使用されます）
 - `$ARGUMENTS`: ユーザーが指定した初期タスク（オプション）
+
+> **Note**: `projectPath`はオプション引数です。プロジェクトディレクトリで実行する場合は省略可能です。
 
 ### 2. 起動完了の報告
 
