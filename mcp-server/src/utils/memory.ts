@@ -106,7 +106,16 @@ export async function ensureMemoryStructure(): Promise<void> {
 }
 
 /**
- * メモリを保存（JSONL形式で追記）
+ * メモリ保存結果
+ */
+export interface SaveMemoryOutcome {
+    entry: MemoryEntry;
+    updated: boolean;
+}
+
+/**
+ * メモリを保存（JSONL形式で追記、重複時は上書き更新）
+ * 重複判定: type と title が完全一致
  */
 export async function saveMemory(
     role: Role,
@@ -114,29 +123,62 @@ export async function saveMemory(
     title: string,
     content: string,
     tags?: string[]
-): Promise<MemoryEntry> {
+): Promise<SaveMemoryOutcome> {
     const memoriesPath = getMemoriesPath();
     await ensureFileExists(memoriesPath);
 
-    const id = generateMessageId();
-    const entry: MemoryEntry = {
-        id: `memory-${id}`,
-        timestamp: new Date().toISOString(),
-        role,
-        type,
-        title,
-        content,
-        tags,
-    };
+    let resultEntry: MemoryEntry;
+    let updated = false;
 
     await withFileLock(memoriesPath, async () => {
-        // JSONL形式で追記
-        const line = JSON.stringify(entry) + '\n';
-        await fs.appendFile(memoriesPath, line, 'utf-8');
+        // 既存エントリを読み取り
+        const fileContent = await fs.readFile(memoriesPath, 'utf-8');
+        const lines = fileContent.trim().split('\n').filter(line => line.length > 0);
+        const entries: MemoryEntry[] = [];
+        for (const line of lines) {
+            try {
+                entries.push(JSON.parse(line) as MemoryEntry);
+            } catch {
+                // パース失敗行はスキップ
+            }
+        }
+
+        // 重複チェック: type + title が完全一致
+        const duplicateIndex = entries.findIndex(e => e.type === type && e.title === title);
+
+        if (duplicateIndex >= 0) {
+            // 重複あり: 既存エントリを上書き更新（IDは維持）
+            const existing = entries[duplicateIndex];
+            existing.content = content;
+            existing.timestamp = new Date().toISOString();
+            existing.role = role;
+            existing.tags = tags;
+
+            // JSONL全体を再書き込み
+            const newContent = entries.map(e => JSON.stringify(e)).join('\n') + '\n';
+            await fs.writeFile(memoriesPath, newContent, 'utf-8');
+
+            resultEntry = existing;
+            updated = true;
+        } else {
+            // 重複なし: 新規追記
+            const id = generateMessageId();
+            resultEntry = {
+                id: `memory-${id}`,
+                timestamp: new Date().toISOString(),
+                role,
+                type,
+                title,
+                content,
+                tags,
+            };
+            const line = JSON.stringify(resultEntry) + '\n';
+            await fs.appendFile(memoriesPath, line, 'utf-8');
+        }
     });
 
-    info(`Memory saved: ${entry.id}`, { type, title, role });
-    return entry;
+    info(`Memory ${updated ? 'updated' : 'saved'}: ${resultEntry!.id}`, { type, title, role });
+    return { entry: resultEntry!, updated };
 }
 
 /**

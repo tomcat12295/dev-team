@@ -8,6 +8,7 @@ import { validateRequiredString } from '../utils/validation.js';
 export interface SaveMemoryResult {
     success: boolean;
     memoryId?: string;
+    updated?: boolean;
     error?: string;
 }
 
@@ -55,7 +56,7 @@ export async function saveMemoryTool(params: SaveMemoryParams): Promise<SaveMemo
     }
 
     try {
-        const entry = await saveMemory(
+        const { entry, updated } = await saveMemory(
             role,
             params.type,
             params.title,
@@ -67,14 +68,15 @@ export async function saveMemoryTool(params: SaveMemoryParams): Promise<SaveMemo
         await addActivity({
             role,
             action: 'save_memory',
-            details: `Saved ${params.type}: ${params.title}`,
+            details: `${updated ? 'Updated' : 'Saved'} ${params.type}: ${params.title}`,
         });
 
-        info(`Memory saved by ${role}`, { memoryId: entry.id, type: params.type });
+        info(`Memory ${updated ? 'updated' : 'saved'} by ${role}`, { memoryId: entry.id, type: params.type });
 
         return {
             success: true,
             memoryId: entry.id,
+            updated,
         };
     } catch (err) {
         error('Failed to save memory', err);
@@ -95,7 +97,8 @@ export function formatSaveMemoryResult(result: SaveMemoryResult, params: SaveMem
         note: 'メモ',
     }[params.type];
 
-    let output = `✅ ${typeLabel}を保存しました。\n`;
+    const actionLabel = result.updated ? '更新しました' : '保存しました';
+    let output = `✅ ${typeLabel}を${actionLabel}。\n`;
     output += `ID: ${result.memoryId}\n`;
     output += `タイトル: ${params.title}\n`;
     if (params.tags && params.tags.length > 0) {
