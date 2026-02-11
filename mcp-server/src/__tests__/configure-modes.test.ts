@@ -37,8 +37,6 @@ describe('configureModes', () => {
         who: '',
         constraints: '',
         currentState: '',
-        decisions: '',
-        notes: '',
         preferences: '',
         lastUpdated: new Date().toISOString(),
     });

@@ -564,7 +564,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     properties: {
                         section: {
                             type: 'string',
-                            enum: ['what', 'why', 'who', 'constraints', 'current_state', 'decisions', 'notes', 'preferences'],
+                            enum: ['what', 'why', 'who', 'constraints', 'current_state', 'preferences'],
                             description: '更新するセクション',
                         },
                         content: {
@@ -588,7 +588,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     properties: {
                         section: {
                             type: 'string',
-                            enum: ['what', 'why', 'who', 'constraints', 'current_state', 'decisions', 'notes', 'preferences'],
+                            enum: ['what', 'why', 'who', 'constraints', 'current_state', 'preferences'],
                             description: '取得するセクション（省略時は全セクション）',
                         },
                     },
@@ -1155,7 +1155,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     };
                 }
                 const updateContextParams = {
-                    section: args.section as 'what' | 'why' | 'who' | 'constraints' | 'current_state' | 'decisions' | 'notes' | 'preferences',
+                    section: args.section as 'what' | 'why' | 'who' | 'constraints' | 'current_state' | 'preferences',
                     content: args.content,
                     append: typeof args?.append === 'boolean' ? args.append : undefined,
                 };
@@ -1170,7 +1170,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
             case 'get_project_context': {
                 const getContextParams = {
-                    section: typeof args?.section === 'string' ? args.section as 'what' | 'why' | 'who' | 'constraints' | 'current_state' | 'decisions' | 'notes' | 'preferences' : undefined,
+                    section: typeof args?.section === 'string' ? args.section as 'what' | 'why' | 'who' | 'constraints' | 'current_state' | 'preferences' : undefined,
                 };
                 const getContextResult = await getProjectContextTool(getContextParams);
                 return {

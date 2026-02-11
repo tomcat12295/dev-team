@@ -103,10 +103,10 @@ describe('updateTaskStatus', () => {
 
         // Set default mock returns for memory module
         (memoryModule.getProjectContext as jest.MockedFunction<typeof memoryModule.getProjectContext>).mockResolvedValue({
-            what: '', why: '', who: '', constraints: '', currentState: '', decisions: '', notes: '', preferences: '', lastUpdated: ''
+            what: '', why: '', who: '', constraints: '', currentState: '', preferences: '', lastUpdated: ''
         });
         (memoryModule.updateProjectContext as jest.MockedFunction<typeof memoryModule.updateProjectContext>).mockResolvedValue({
-            what: '', why: '', who: '', constraints: '', currentState: '', decisions: '', notes: '', preferences: '', lastUpdated: ''
+            what: '', why: '', who: '', constraints: '', currentState: '', preferences: '', lastUpdated: ''
         });
 
         // Import the module under test
@@ -290,7 +290,7 @@ describe('updateTaskStatus', () => {
             mockGetProjectContext.mockResolvedValue({
                 what: '', why: '', who: '', constraints: '',
                 currentState: `### member-01\n- タスクID: T-314\n- タスク名: テストタスク\n- フェーズ: implementing\n`,
-                decisions: '', notes: '', preferences: '', lastUpdated: ''
+                preferences: '', lastUpdated: ''
             });
 
             await updateTaskStatus({

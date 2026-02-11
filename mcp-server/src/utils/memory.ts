@@ -37,12 +37,6 @@ const PROJECT_CONTEXT_TEMPLATE = `# Project Context
 ## Current State
 （未設定）
 
-## Decisions
-（未設定）
-
-## Notes
-（未設定）
-
 ## Preferences
 （未設定）
 `;
@@ -54,8 +48,6 @@ const SECTION_HEADERS: Record<ProjectContextSection, string> = {
     'who': 'Who',
     'constraints': 'Constraints',
     'current_state': 'Current State',
-    'decisions': 'Decisions',
-    'notes': 'Notes',
     'preferences': 'Preferences',
 };
 
@@ -66,8 +58,6 @@ const SECTION_ORDER: ProjectContextSection[] = [
     'who',
     'constraints',
     'current_state',
-    'decisions',
-    'notes',
     'preferences',
 ];
 
@@ -273,8 +263,6 @@ export async function getProjectContext(): Promise<ProjectContext> {
             who: '（未設定）',
             constraints: '（未設定）',
             currentState: '（未設定）',
-            decisions: '（未設定）',
-            notes: '（未設定）',
             preferences: '（未設定）',
             lastUpdated: new Date().toISOString(),
         };
@@ -293,8 +281,6 @@ function parseProjectContext(markdown: string): ProjectContext {
         who: '',
         constraints: '',
         currentState: '',
-        decisions: '',
-        notes: '',
         preferences: '',
         lastUpdated: new Date().toISOString(),
     };
@@ -343,12 +329,6 @@ function parseProjectContext(markdown: string): ProjectContext {
                     break;
                 case 'current_state':
                     context.currentState = sectionContent;
-                    break;
-                case 'decisions':
-                    context.decisions = sectionContent;
-                    break;
-                case 'notes':
-                    context.notes = sectionContent;
                     break;
                 case 'preferences':
                     context.preferences = sectionContent;

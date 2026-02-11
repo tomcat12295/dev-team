@@ -76,12 +76,6 @@ describe('memory - getTaskSplitApproval', () => {
 ## Current State
 （未設定）
 
-## Decisions
-（未設定）
-
-## Notes
-（未設定）
-
 ## Preferences
 （未設定）
 `;
@@ -108,12 +102,6 @@ describe('memory - getTaskSplitApproval', () => {
 なし
 
 ## Current State
-（未設定）
-
-## Decisions
-（未設定）
-
-## Notes
 （未設定）
 
 ## Preferences
@@ -145,12 +133,6 @@ reviewMode: normal
 ## Current State
 （未設定）
 
-## Decisions
-（未設定）
-
-## Notes
-（未設定）
-
 ## Preferences
 taskSplitApproval: auto
 reviewMode: strict
@@ -178,12 +160,6 @@ reviewMode: strict
 なし
 
 ## Current State
-（未設定）
-
-## Decisions
-（未設定）
-
-## Notes
 （未設定）
 
 ## Preferences
@@ -221,12 +197,6 @@ otherSetting: value
 なし
 
 ## Current State
-（未設定）
-
-## Decisions
-（未設定）
-
-## Notes
 （未設定）
 
 ## Preferences
